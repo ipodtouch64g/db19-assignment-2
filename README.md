@@ -119,14 +119,11 @@ If we find you copy someone’s code, you will get **0 point** for this assignme
 
 ## Hints
 
-1. We have already implemented a stored procedure version and a JDBC version for **ReadItem**. You can find them in the following packages:
-	- JDBC => `org.vanilladb.bench.as2.rte.jdbc.As2ReadItemJob`
-	- Stored Procedure => `org.vanilladb.bench.server.procedure.as2.As2ReadItemProc`
-
+1. We have already implemented **ReadItem**. You can find the code for JDBC and stored procedures in the following packages:
+	- JDBC => `org.vanilladb.bench.benchmarks.as2.rte.jdbc.ReadItemTxnJdbcJob`
+	- Stored Procedure => `org.vanilladb.bench.server.procedure.as2.ReadItemTxnProc`
 2. You can modify `getNextTxType()` in `org.vanilladb.bench.benchmarks.as2.rte.As2BenchRte` to control which type of transactions will be the next to go.
-
 3. Check out `As2BenchConstants` to see how we get a value from `vanillabench.properties`.
-
 4. If you encounter any problem, take a look our [FAQ repository](https://shwu10.cs.nthu.edu.tw/courses/databases/2019-spring/faq) first.
 
 
