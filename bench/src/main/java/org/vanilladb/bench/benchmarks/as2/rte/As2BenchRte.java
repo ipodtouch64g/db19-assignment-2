@@ -15,10 +15,17 @@
  *******************************************************************************/
 package org.vanilladb.bench.benchmarks.as2.rte;
 
+
+
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.vanilladb.bench.BenchmarkerParameters;
 import org.vanilladb.bench.StatisticMgr;
+import org.vanilladb.bench.benchmarks.as2.As2BenchConstants;
 import org.vanilladb.bench.benchmarks.as2.As2BenchTxnType;
 import org.vanilladb.bench.remote.SutConnection;
 import org.vanilladb.bench.rte.RemoteTerminalEmulator;
+import org.vanilladb.bench.util.RandomValueGenerator;
 
 public class As2BenchRte extends RemoteTerminalEmulator<As2BenchTxnType> {
 	
@@ -26,14 +33,29 @@ public class As2BenchRte extends RemoteTerminalEmulator<As2BenchTxnType> {
 
 	public As2BenchRte(SutConnection conn, StatisticMgr statMgr) {
 		super(conn, statMgr);
-		executor = new As2BenchTxExecutor(new As2ReadItemParamGen());
 	}
 	
+	// Here, decide which Tx to do...
 	protected As2BenchTxnType getNextTxType() {
-		return As2BenchTxnType.READ_ITEM;
+		RandomValueGenerator rvg = new RandomValueGenerator();
+		double tmp = ThreadLocalRandom.current().nextDouble(0.0, 1.0);
+		if(tmp > BenchmarkerParameters.READ_WRITE_TX_RATE)
+		{
+			
+			return As2BenchTxnType.READ_ITEM;
+		}	
+		else
+		{
+			return As2BenchTxnType.UPDATE_ITEM_PRICE;
+
+		}
 	}
 	
 	protected As2BenchTxExecutor getTxExeutor(As2BenchTxnType type) {
+		if(type==As2BenchTxnType.UPDATE_ITEM_PRICE)
+			executor = new As2BenchTxExecutor(new As2UpdateItemPriceParamGen());
+		else
+			executor = new As2BenchTxExecutor(new As2ReadItemParamGen());
 		return executor;
 	}
 }

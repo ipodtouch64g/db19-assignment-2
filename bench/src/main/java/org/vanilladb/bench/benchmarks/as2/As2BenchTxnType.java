@@ -22,7 +22,10 @@ public enum As2BenchTxnType implements TransactionType {
 	TESTBED_LOADER,
 	
 	// Benchmarking procedures
-	READ_ITEM;
+	READ_ITEM,
+	
+	// Update Item Transaction
+	UPDATE_ITEM_PRICE;
 	
 	public static As2BenchTxnType fromProcedureId(int pid) {
 		return As2BenchTxnType.values()[pid];
@@ -33,7 +36,7 @@ public enum As2BenchTxnType implements TransactionType {
 	}
 	
 	public boolean isBenchmarkingTx() {
-		if (this == READ_ITEM)
+		if (this == READ_ITEM || this == UPDATE_ITEM_PRICE)
 			return true;
 		return false;
 	}

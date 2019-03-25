@@ -32,9 +32,11 @@ public class As2BenchJdbcExecutor implements JdbcExecutor<As2BenchTxnType> {
 			return new TestbedLoaderJdbcJob().execute(conn, pars);
 		case READ_ITEM:
 			return new ReadItemTxnJdbcJob().execute(conn, pars);
+		case UPDATE_ITEM_PRICE:
+			return new UpdateItemPriceTxnJdbcJob().execute(conn, pars);
 		default:
 			throw new UnsupportedOperationException(
-					String.format("no JDCB implementation for '%s'", txType));
+					String.format("no JDBC implementation for '%s'", txType));
 		}
 	}
 

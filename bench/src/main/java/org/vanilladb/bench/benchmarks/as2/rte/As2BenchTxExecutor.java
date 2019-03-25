@@ -49,7 +49,7 @@ public class As2BenchTxExecutor extends TransactionExecutor<As2BenchTxnType> {
 			txnRT = System.nanoTime() - txnRT;
 
 			// display output
-			if (TransactionExecutor.DISPLAY_RESULT)
+//			if (TransactionExecutor.DISPLAY_RESULT)
 				System.out.println(pg.getTxnType() + " " + result.outputMsg());
 
 			rs.setTxnIsCommited(result.isCommitted());
