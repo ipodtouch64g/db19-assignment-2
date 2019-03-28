@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -101,7 +102,8 @@ public class StatisticMgr {
 		for (TxnResultSet trs : trss)
 			resultSets.add(trs);
 	}
-
+	
+	
 	public synchronized void outputReport() {
 		try {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-HHmmss"); // E.g. "20180524-200824"
@@ -119,12 +121,16 @@ public class StatisticMgr {
 			logger.info("Finnish creating tpcc benchmark report");
 	}
 	
+	// add another detailed report here!
 	private void outputDetailReport(String fileName) throws IOException {
 		HashMap<TransactionType, TxnStatistic> txnStatistics = new HashMap<TransactionType, TxnStatistic>();
 		
 		for (TransactionType type : allTxTypes)
 			txnStatistics.put(type, new TxnStatistic(type));
 		
+		// ***********************************
+		// this is original report .txt
+		// ***********************************
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(OUTPUT_DIR, fileName + ".txt")))) {
 			// First line: total transaction count
 			writer.write("# of txns during benchmark period: " + resultSets.size());
@@ -166,6 +172,43 @@ public class StatisticMgr {
 			} else {
 				writer.write("TOTAL 0 avg latency: 0 ms");
 			}
+		}
+		// ***********************************
+		// this is new detailed report .csv
+		// ***********************************
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(OUTPUT_DIR, fileName + ".csv")))) {
+			// First line: total transaction count
+			writer.write("time(sec), throughput(txs), avg_latency(ms), min(ms), max(ms), 25th_lat(ms), median_lat(ms), 75th_lat(ms)");
+			writer.newLine();
+			
+			ArrayList <Double> every_five_sec_tx = new ArrayList<Double>(); 
+			double wall_clock = 0.0;
+			int	clock_per_5 = 0;
+			
+			for (TxnResultSet resultSet : resultSets) {
+				// latency of this tx
+				double latency = TimeUnit.NANOSECONDS.toMillis(resultSet.getTxnResponseTime());
+				every_five_sec_tx.add(latency);
+				wall_clock += latency;
+				// print the result every 5 seconds
+				if(wall_clock > 0.0 && wall_clock/5000.0 > clock_per_5 )
+				{
+					Collections.sort(every_five_sec_tx);
+					writer.write(String.format("%d,%d,%f,%f,%f,%f,%f,%f\n",
+							clock_per_5*5,
+							every_five_sec_tx.size(),
+							every_five_sec_tx.stream().mapToDouble(Double::doubleValue).average().orElse(0.0),
+							Collections.min(every_five_sec_tx),
+							Collections.max(every_five_sec_tx),
+							every_five_sec_tx.get(every_five_sec_tx.size()/4),
+							every_five_sec_tx.get(every_five_sec_tx.size()/2),
+							every_five_sec_tx.get(every_five_sec_tx.size()*3/4)
+						    ));
+					clock_per_5++;
+					every_five_sec_tx.clear();
+				}
+			} 
+			
 		}
 	}
 }
